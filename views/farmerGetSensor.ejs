@@ -1,0 +1,14 @@
+<table class="table">
+        <thead>
+                <tr>
+                    <th>Sensor Type</th>
+                    <th>Status</th>
+                </tr>
+        </thead>
+        <tr>
+                <% message.forEach(function(msg){ %>
+            <td><%= msg.sType %></td> 
+            <td><%= msg.status %></td>
+        </tr><%  }); %>
+
+</table>

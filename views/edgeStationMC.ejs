@@ -1,0 +1,22 @@
+<table class="table">
+    <thead>
+            <tr>
+                <th>Edge Station Number</th>
+                <th>Farmer ID</th>
+                <th>Sensor Type</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+    </thead>
+    <tr>
+        <% message.forEach(function(msg){ %>
+        <td><%= msg.esId %></td> 
+        <td><%= msg.fId %></td>  
+        <td><%= msg.sType %></td> 
+        <td><%= msg.status %></td>
+        <td><button type="button">Active</button></td>
+    </tr><%  }); %>
+
+</table>
+
+<h6><button type="button" onclick="location.href='http://localhost:5000/sensor';"> Add Sensor</a></h6>

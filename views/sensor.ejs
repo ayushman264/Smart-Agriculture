@@ -1,0 +1,12 @@
+<html>
+    <body>
+        <h1>Add Sensor</h1>
+        <form action= "http://localhost:5000/sensor" method="post">
+            <%= message %><br>
+            <input type="text" name="stype" id="stype" required/><br>
+            <input type="text" name="sdesc" id="sdesc" required/><br>
+            <input type="number" name="price" id="price" required/><br>
+            <button type="submit">Add Sensor</button>
+        </form>
+    </body>
+</html>
