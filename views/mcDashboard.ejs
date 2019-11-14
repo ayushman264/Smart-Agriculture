@@ -1,0 +1,27 @@
+<table class="table">
+        <thead>
+                <tr>
+                    <th>Sensor Type</th>
+                    <th>Description</th>
+                    <th>Price(Per Hour)</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+        </thead>
+        <tr>
+            <% if (message=="No sensors added"){ %>
+                <%= message %>
+            <% }else{ %>
+            <% message.forEach(function(msg){ %>
+            <td><%= msg.stype %></td> 
+            <td><%= msg.sdesc %></td>
+            <td><%= msg.price %></td>
+            <td><%= msg.status %></td>
+            <td><button>Delete</button><button>Update</button></td>
+        </tr><%  }); %>
+        <% } %>
+
+</table>
+
+<h6><button type="button" onclick="location.href='http://localhost:5000/sensor';"> Add Sensor</a></h6>
+<h6><button type="button" onclick="location.href='http://localhost:5000/edgeStationMC';"> View Edge Station</a></h6>

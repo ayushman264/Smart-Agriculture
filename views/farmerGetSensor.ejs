@@ -6,9 +6,15 @@
                 </tr>
         </thead>
         <tr>
+                <% if (message=="No sensors rented"){ %>
+                <%= message %>
+                <% }else{ %>
                 <% message.forEach(function(msg){ %>
             <td><%= msg.sType %></td> 
             <td><%= msg.status %></td>
         </tr><%  }); %>
+        <% } %>
 
 </table>
+
+<h6><button type="button" onclick="location.href='http://localhost:5000/farmerAddSensor';"> Add Sensor</a></h6>

@@ -2,8 +2,16 @@
     <body>
         <form action= "http://localhost:5000/farmerAddSensor" method="post">
             <%= message %><br>
-            <input type="text" name="type" id="type" required/><br>
+            Sensor Type: <br>
+            <input type="radio" name="type" value="Temperature"> Temperature<br>
+            <input type="radio" name="type" value="Humidity"> Humidity<br>
+            <input type="radio" name="type" value="Precipitation"> Precipitation Intensity and Probability<br>
+            <input type="radio" name="type" value="Wind"> Wind<br>
+            <input type="radio" name="type" value="Visibility"> Visibility<br><br>
             <button type="submit">Select Sensor</button>
         </form>
+
+
+<h6><button type="button" onclick="location.href='http://localhost:5000/farmerGetSensor';"> View Sensors</a></h6>
     </body>
 </html>
