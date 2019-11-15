@@ -2,11 +2,19 @@
     <body>
         <form action= "http://localhost:5000/register" method="post">
             <%= message %><br>
-            <input type="text" name="usertype" id="usertype" required/><br>
-            <input type="text" name="name" id="name" required/><br>
-            <input type="number" name="contact" id="contact" required/><br>
-            <input type="email" name="email" id="email" required/><br>
-            <input type="password" name="password" id="password" required/><br>
+             User Type <select name="usertype">
+                    <option value="Farmer">Farmer</option>
+                    <option value="Machine Controller">Machine Controller</option>
+            </select><br>
+            Name <input type="text" name="name" id="name" required/><br>
+            Contact <input type="number" name="contact" id="contact" required/><br>
+            Email <input type="email" name="email" id="email" required/><br>
+            Password <input type="password" name="password" id="password" required/><br>
+            Location <select name="location">
+                    <option value="37.3382,-121.8863">San Jose</option>
+                    <option value="37.7749,-122.4194">San Francisco</option>
+                    <option value="40.7128,-74.0060">New York</option>
+            </select><br>
             <button type="submit">Register</button>
         </form>
     </body>

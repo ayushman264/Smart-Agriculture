@@ -1,0 +1,18 @@
+<table class="table">
+        <thead>
+                <tr>
+                    <th>Sensor Type</th>
+                    <th>Value</th>
+                </tr>
+        </thead>
+        <tr>
+                <% if (message=="No sensors rented"){ %>
+                <%= message %>
+                <% }else{ %>
+                <% message.forEach(function(msg){ %>
+            <td><%= msg.type %></td> 
+            <td><%= msg.value %></td>
+        </tr><%  }); %>
+        <% } %>
+
+</table>

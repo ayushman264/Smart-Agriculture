@@ -23,13 +23,15 @@ DROP TABLE IF EXISTS `edge_station`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `edge_station` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `esId` int(11) NOT NULL,
   `fId` int(11) NOT NULL,
   `mcId` int(11) NOT NULL,
   `sId` int(11) NOT NULL,
-  `status` varchar(45) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'Inactive',
-  `sType` varchar(45) COLLATE utf8mb4_general_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` varchar(45) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'Connected',
+  `sType` varchar(45) COLLATE utf8mb4_general_ci NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -38,7 +40,7 @@ CREATE TABLE `edge_station` (
 
 LOCK TABLES `edge_station` WRITE;
 /*!40000 ALTER TABLE `edge_station` DISABLE KEYS */;
-INSERT INTO `edge_station` VALUES (1,1,2,1,'Inactive','a'),(2,1,2,1,'Inactive','a'),(3,1,2,1,'Inactive','a'),(4,1,2,1,'Inactive','a');
+INSERT INTO `edge_station` VALUES (1,4,4,5,1,'Connected','Temperature'),(2,4,4,5,2,'Connected','Humidity');
 /*!40000 ALTER TABLE `edge_station` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -51,4 +53,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-11-13 16:27:28
+-- Dump completed on 2019-11-14 17:28:33

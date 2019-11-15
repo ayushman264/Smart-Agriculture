@@ -4,6 +4,7 @@ const mysql = require('mysql');
 const path = require('path');
 const app = express();
 const fs = require('fs');
+const request=require('request');
 app.use(bodyParser.json()); 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine','ejs');
@@ -54,8 +55,9 @@ app.post('/register', (req, res) => {
     let usertype=req.body.usertype;
     let email=req.body.email;
     let password = req.body.password;
+    let location = req.body.location;
     let q="select * from user where email = '"+email+"'";
-    let query = "INSERT INTO `user` (name, contact, email, password, usertype) VALUES ('" + name + "', '" + contact + "','" + email + "','" + password + "','" + usertype + "')";
+    let query = "INSERT INTO `user` (name, contact, email, password, usertype, location) VALUES ('" + name + "', '" + contact + "','" + email + "','" + password + "','" + usertype + "','" + location + "')";
 
     db.query(q, (err, result) => {
         if (err) {
@@ -333,6 +335,111 @@ app.get('/edgeStationMC', (req, res) => {
 
 
 app.get('/mcDashboard', (req, res) => {
+    console.log("req body "+ JSON.stringify(req.body));
+    sess = req.session;
+    let q="select id from user where email = '"+sess.email+"'";
+    
+    db.query(q, (err, result) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+        if(!result.length){
+            res.render('login',{message:"Invalid Session"});
+        }else{
+            let q2="select * from sensor where mcId='"+JSON.stringify(result[0].id)+"'";
+            db.query(q2, (err, result1) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).send(err);
+                }
+                if(!result1.length){
+                    res.render('mcDashboard',{message:"No sensors added"});
+                }else{
+                    console.log(JSON.parse(JSON.stringify(result1)));
+                    res.render('mcDashboard',{message : JSON.parse(JSON.stringify(result1))});
+                }
+                }
+            );
+            
+        }
+        }
+    );
+});
+
+app.get('/monitor', (req, res) => {
+    console.log("req body "+ JSON.stringify(req.body));
+    sess = req.session;
+    let q="select id,location from user where email = '"+sess.email+"'";
+    
+    db.query(q, (err, result) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+        if(!result.length){
+            res.render('login',{message:"Invalid Session"});
+        }else{
+            let q1="select sType from edge_station where fId='"+result[0].id+"' and status='Connected'";
+            let loc=result[0].location;
+            db.query(q1, (err, result1) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).send(err);
+                }
+                if(!result1.length){
+                    res.render('monitor',{message:"No active sensors"});
+                }else{
+                    var listOfObjects = [];
+                    console.log(result1[0].sType);
+                    request(`https://api.darksky.net/forecast/1cc49bed160877460d1977016029cdd8/${loc}`, { json: true }, (err, resp, body) => {
+                    if (err) { return console.log(err); }
+                    for(var i=0;i<result1.length;i++){
+                        if(result1[i].sType=="Temperature"){
+                            console.log(resp.body.currently.temperature);
+                            var singleObj = {};
+                            singleObj['type'] = result1[i].sType;
+                            singleObj['value'] = resp.body.currently.temperature;
+                            listOfObjects.push(singleObj);
+                        }else if(result1[i].sType=="Humidity"){
+                            console.log(resp.body.currently.humidity);
+                            var singleObj = {};
+                            singleObj['type'] = result1[i].sType;
+                            singleObj['value'] = resp.body.currently.humidity;
+                            listOfObjects.push(singleObj);
+                        }else if(result1[i].sType=="Precipitation"){
+                            console.log(resp.body.currently.precipIntensity);
+                            var singleObj = {};
+                            singleObj['type'] = result1[i].sType;
+                            singleObj['value'] = resp.body.currently.precipIntensity;
+                            listOfObjects.push(singleObj);
+                        }else if(result1[i].sType=="Wind"){
+                            console.log(resp.body.currently.windSpeed);
+                            var singleObj = {};
+                            singleObj['type'] = result1[i].sType;
+                            singleObj['value'] = resp.body.currently.wind;
+                            listOfObjects.push(singleObj);
+                        }else if(result1[i].sType=="Visibility"){
+                            console.log(resp.body.currently.visibility);
+                            var singleObj = {};
+                            singleObj['type'] = result1[i].sType;
+                            singleObj['value'] = resp.body.currently.visibility;
+                            listOfObjects.push(singleObj);
+                        }
+                    }
+                    console.log(listOfObjects);
+                    res.render('monitor',{message : listOfObjects});
+                    });
+                    
+                }
+                }
+            );
+            
+        }
+        }
+    );
+});
+
+
+app.put('/updateSensorStatus', (req, res) => {
     console.log("req body "+ JSON.stringify(req.body));
     sess = req.session;
     let q="select id from user where email = '"+sess.email+"'";
