@@ -1,3 +1,33 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+<script>
+        $(document).ready(function(){
+          $(".btn1").click(function(){
+            //console.log($(this).attr('id'));
+            $.ajax({
+            url: "http://localhost:5000/updateSensorStatus/",
+            type: "PUT",
+            data: {sid:$(this).attr('id')},
+            dataType: "json",
+            success: function (res) {
+                if(res.status===200) console.log("Status check true");
+                if(res.status==="success") console.log("test 2 success");
+                var ret = JSON.stringify(data);
+                //window.location.href='Deleted.html';
+            },
+            error: function (xhr, status, error) {
+                if(res.status===200) console.log("Status check truekkkkkk");
+                if(res.status==="success") console.log("test 2 successkjkjkjkj");
+                //window.location.href='Not Deleted.html';
+            }
+            }).done(()=>{
+                console.log("ggggggg"); 
+                location.reload(true);
+            })				
+            location.reload(true);
+          });
+        });
+    </script>
 <table class="table">
         <thead>
                 <tr>
@@ -17,7 +47,9 @@
             <td><%= msg.sdesc %></td>
             <td><%= msg.price %></td>
             <td><%= msg.status %></td>
-            <td><button>Delete</button><button>Update</button></td>
+            <!--<td><button class="btn1" id=<%=msg.sid%>>Active</button></td>-->
+
+            <!-- <form action= "http://localhost:5000/updateSensorStatus/" method="put"><button>Update</button></form></td> -->
         </tr><%  }); %>
         <% } %>
 
@@ -25,3 +57,4 @@
 
 <h6><button type="button" onclick="location.href='http://localhost:5000/sensor';"> Add Sensor</a></h6>
 <h6><button type="button" onclick="location.href='http://localhost:5000/edgeStationMC';"> View Edge Station</a></h6>
+    <h6><button type="button" onclick="location.href='http://localhost:5000/logout';"> View Edge Station</a></h6>

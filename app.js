@@ -222,7 +222,7 @@ app.post('/farmerAddSensor', (req, res) => {
     //let price = req.body.price;
     sess = req.session;
     let q="select id from user where email = '"+sess.email+"'";
-    let q2="select mcId, sid from sensor where stype='"+type+"' and price=(select min(price) from sensor where stype='"+type+"' and status='Inactive' limit 1)";
+    let q2="select mcId, sid from sensor where stype='"+type+"' and price=(select min(price) from sensor where stype='"+type+"' and status='Not In Use' limit 1)";
     
     db.query(q, (err, result) => {
         if (err) {
@@ -344,7 +344,7 @@ app.get('/mcDashboard', (req, res) => {
             return res.status(500).send(err);
         }
         if(!result.length){
-            res.render('login',{message:"Invalid Session"});
+            res.redirect('login');
         }else{
             let q2="select * from sensor where mcId='"+JSON.stringify(result[0].id)+"'";
             db.query(q2, (err, result1) => {
@@ -378,7 +378,7 @@ app.get('/monitor', (req, res) => {
         if(!result.length){
             res.render('login',{message:"Invalid Session"});
         }else{
-            let q1="select sType from edge_station where fId='"+result[0].id+"' and status='Connected'";
+            let q1="select sType from edge_station where fId='"+result[0].id+"' and status='Active'";
             let loc=result[0].location;
             db.query(q1, (err, result1) => {
                 if (err) {
@@ -428,11 +428,9 @@ app.get('/monitor', (req, res) => {
                     console.log(listOfObjects);
                     res.render('monitor',{message : listOfObjects});
                     });
-                    
                 }
                 }
             );
-            
         }
         }
     );
@@ -442,6 +440,7 @@ app.get('/monitor', (req, res) => {
 app.put('/updateSensorStatus', (req, res) => {
     console.log("req body "+ JSON.stringify(req.body));
     sess = req.session;
+    let id=req.body.sid;
     let q="select id from user where email = '"+sess.email+"'";
     
     db.query(q, (err, result) => {
@@ -451,17 +450,27 @@ app.put('/updateSensorStatus', (req, res) => {
         if(!result.length){
             res.render('login',{message:"Invalid Session"});
         }else{
-            let q2="select * from sensor where mcId='"+JSON.stringify(result[0].id)+"'";
+            let q2="UPDATE edge_station SET status = 'Active' WHERE sId='"+id+"'";
             db.query(q2, (err, result1) => {
+                console.log(result1);
                 if (err) {
                     console.log(err);
                     return res.status(500).send(err);
                 }
                 if(!result1.length){
-                    res.render('mcDashboard',{message:"No sensors added"});
-                }else{
                     console.log(JSON.parse(JSON.stringify(result1)));
-                    res.render('mcDashboard',{message : JSON.parse(JSON.stringify(result1))});
+                    let q3="UPDATE sensor SET status = 'Active' WHERE sid='"+id+"'";
+                    db.query(q3, (err, result1) => {
+                    if (err) {
+                        console.log(err);
+                        return res.status(500).send(err);
+                    }
+                    if(!result1.length){
+                        console.log(JSON.parse(JSON.stringify(result1)));
+                        res.status(200).send("Success");
+                    }
+                }
+            );
                 }
                 }
             );
@@ -470,3 +479,16 @@ app.put('/updateSensorStatus', (req, res) => {
         }
     );
 });
+
+
+app.get('/logout',function(req,res){    
+    req.session.destroy(function(err){  
+        if(err){  
+            console.log(err);  
+        }  
+        else  
+        {
+            res.redirect('/login');  
+        }
+    });
+});  
