@@ -11,6 +11,8 @@ app.set('view engine','ejs');
 app.set('views','./views');
 const session = require('express-session');
 app.use(session({secret: 'abcd',saveUninitialized: true,resave: true}));
+
+
 var sess;
 
 const port = 5000;
@@ -18,7 +20,7 @@ const port = 5000;
 const db = mysql.createConnection ({
     host: 'localhost',
     user: 'root',
-    password: 'admin@123',
+    password: '',
     database: '281db'
 });
 
@@ -68,11 +70,11 @@ app.post('/register', (req, res) => {
                 if (err) {
                     return res.status(500).send(err);
                 }else{
-                    res.render('register',{message:"Registered Successfully"});
+                    res.send(result);
                 }
             });
         }else{
-            res.render('register',{message:"Email ID already registered"}); 
+            res.send({message:"Email ID already registered"});
         }
 
 
@@ -86,17 +88,22 @@ app.get('/login',function(req,res){
 });
 
 app.post('/login', (req, res) => {
+
     console.log("req body "+ JSON.stringify(req.body));
     let email=req.body.email;
     let password = req.body.password;
+    console.log('Received req'+email+" "+password);
     let q="select * from user where email = '"+email+"' and password = '"+password+"'";
     db.query(q, (err, result) => {
         if (err) {
-            return res.status(500).send(err);
+            res.send({message:"Invalid User ID or Password"});
         }
         if(!result.length){
+            res.send({message:"Invalid User ID or Password"});
             res.render('login',{message:"Invalid User ID or Password"});
         }else{
+            res.send({message:"success"});
+
             sess = req.session;
             sess.email=email;
             sess.password=password;
@@ -104,10 +111,13 @@ app.post('/login', (req, res) => {
             console.log(JSON.stringify(result[0].usertype));
             //res.redirect('/mcDashboard');
             console.log(result[0].usertype=="Machine Controller");
-            if(result[0].usertype=="Farmer") res.redirect('/dashboard');
-            if(result[0].usertype=="Machine Controller") res.redirect('/mcDashboard');
+            
+            if(result[0].usertype=="Farmer") {}//res.redirect('/dashboard');
+            if(result[0].usertype=="Machine Controller") {}//res.redirect('/mcDashboard');
+
         }
         }
+
     );
 });
 
@@ -133,6 +143,7 @@ app.post('/sensor', (req, res) => {
             return res.status(500).send(err);
         }
         if(!result.length){
+            res.send({message:"Please login"});
             res.render('sensor',{message:"Invalid Session"});
         }else{
             let q1="insert into sensor (mcId, stype, sdesc,price) VALUES ('"+JSON.stringify(result[0].id)+"', '"+stype+"', '"+sdesc+"', '"+price+"')";
@@ -140,6 +151,7 @@ app.post('/sensor', (req, res) => {
                 if (err) {
                     return res.status(500).send(err);
                 }else{
+                    res.send({message:"success"});
                     res.redirect('/mcDashboard');
                 }
             });
@@ -171,6 +183,7 @@ app.post('/service', (req, res) => {
                 if (err) {
                     return res.status(500).send(err);
                 }else{
+                    res.render({message:"success"});
                     res.render('service',{message:"Service Added"});
                 }
             });
@@ -203,6 +216,7 @@ app.post('/machine', (req, res) => {
                 if (err) {
                     return res.status(500).send(err);
                 }else{
+                    res.send({message:"Machine Added"});
                     res.render('machine',{message:"Machine Added"});
                 }
             });
@@ -238,6 +252,7 @@ app.post('/farmerAddSensor', (req, res) => {
                     return res.status(500).send(err);
                 }
                 if(!result1.length){
+                    res.send({message:"Sensor not available currently"});
                     res.render('farmerAddSensor',{message:"Sensor not available currently"});
                 }else{
                     console.log(JSON.parse(JSON.stringify(result1)));
@@ -246,7 +261,7 @@ app.post('/farmerAddSensor', (req, res) => {
                     if (err) {
                         return res.status(500).send(err);
                     }else{
-                        
+                        res.send({message:"Sensor updated"});
                     }
                     });
                     let q1="insert into edge_station (esId, fId, mcId, sId, sType) VALUES ('"+JSON.stringify(result[0].id)+"','"+JSON.stringify(result[0].id)+"', '"+JSON.stringify(result1[0].mcId)+"', '"+JSON.stringify(result1[0].sid)+"', '"+type+"')";
@@ -459,6 +474,7 @@ app.put('/updateSensorStatus', (req, res) => {
                 }
                 if(!result1.length){
                     console.log(JSON.parse(JSON.stringify(result1)));
+<<<<<<< HEAD
                     let q3="UPDATE sensor SET status = 'Active' WHERE sid='"+id+"'";
                     db.query(q3, (err, result1) => {
                     if (err) {
@@ -471,10 +487,13 @@ app.put('/updateSensorStatus', (req, res) => {
                     }
                 }
             );
+=======
+                    res.render('mcDashboard',{message : JSON.parse(JSON.stringify(result1))});
+                    res.send({message:"Sensor updated"});
+>>>>>>> 432238d1f95cd44ce293c66f64d16fed4a2149e8
                 }
                 }
             );
-            
         }
         }
     );
