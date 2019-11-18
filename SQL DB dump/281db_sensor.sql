@@ -26,13 +26,12 @@ CREATE TABLE `sensor` (
   `sid` int(11) NOT NULL AUTO_INCREMENT,
   `mcId` int(11) NOT NULL,
   `stype` varchar(45) COLLATE utf8mb4_general_ci NOT NULL,
-  `sdesc` varchar(45) COLLATE utf8mb4_general_ci NOT NULL,
-  `status` varchar(45) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'Inactive',
+  `status` varchar(45) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'Not In Use',
   `price` decimal(6,1) DEFAULT NULL,
   PRIMARY KEY (`sid`),
   KEY `mcId_idx` (`mcId`),
   CONSTRAINT `mcId` FOREIGN KEY (`mcId`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -41,7 +40,7 @@ CREATE TABLE `sensor` (
 
 LOCK TABLES `sensor` WRITE;
 /*!40000 ALTER TABLE `sensor` DISABLE KEYS */;
-INSERT INTO `sensor` VALUES (1,5,'Temperature','good','Connected',600.0),(2,5,'Humidity','ac','Connected',55.0);
+INSERT INTO `sensor` VALUES (1,5,'Temperature','Not In Use',1.0),(2,5,'Visibility','Active',1.0),(3,5,'Precipitation','Inactive',1.0),(4,5,'Visibility','Inactive',33.0),(5,5,'Precipitation','Not In Use',66.0),(6,5,'Precipitation','Not In Use',4.0),(7,5,'Humidity','Active',45.0);
 /*!40000 ALTER TABLE `sensor` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -54,4 +53,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-11-14 17:28:33
+-- Dump completed on 2019-11-17 19:26:17

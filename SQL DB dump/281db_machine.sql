@@ -26,11 +26,12 @@ CREATE TABLE `machine` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `mType` varchar(45) COLLATE utf8mb4_general_ci NOT NULL,
   `mDesc` varchar(45) COLLATE utf8mb4_general_ci NOT NULL,
-  `status` varchar(45) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'Inactive',
+  `status` varchar(45) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'Not In Use',
   `mPrice` decimal(6,1) NOT NULL,
   `mcId` int(11) NOT NULL,
+  `fId` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -39,6 +40,7 @@ CREATE TABLE `machine` (
 
 LOCK TABLES `machine` WRITE;
 /*!40000 ALTER TABLE `machine` DISABLE KEYS */;
+INSERT INTO `machine` VALUES (1,'Tractor','Red Tractor','Connected',40.0,5,7),(2,'Grazer','Red','Inactive',38.0,5,NULL),(3,'Grazer','Red','Inactive',38.0,5,NULL),(4,'Grazer','Red','Inactive',38.0,5,NULL);
 /*!40000 ALTER TABLE `machine` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -51,4 +53,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-11-14 17:28:32
+-- Dump completed on 2019-11-17 19:26:14

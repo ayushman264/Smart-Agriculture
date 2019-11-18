@@ -24,12 +24,13 @@ DROP TABLE IF EXISTS `services`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `services` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `serDesc` varchar(45) COLLATE utf8mb4_general_ci NOT NULL,
+  `serDesc` varchar(405) COLLATE utf8mb4_general_ci NOT NULL,
   `mcId` int(11) NOT NULL,
   `serPrice` decimal(6,1) NOT NULL,
-  `status` varchar(45) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'Inactive',
+  `status` varchar(45) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'Not In Use',
+  `fId` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -38,6 +39,7 @@ CREATE TABLE `services` (
 
 LOCK TABLES `services` WRITE;
 /*!40000 ALTER TABLE `services` DISABLE KEYS */;
+INSERT INTO `services` VALUES (1,'1 Tractor, 2 Wind Sensors',5,100.0,'Connected',7),(2,'5 Tractors, 5 Sensors',5,44.0,'Not In Use',NULL),(3,'2 Tractors',5,35.0,'Not In Use',NULL),(4,'7 Grazers',5,90.0,'Not In Use',NULL);
 /*!40000 ALTER TABLE `services` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -50,4 +52,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-11-14 17:28:32
+-- Dump completed on 2019-11-17 19:26:15

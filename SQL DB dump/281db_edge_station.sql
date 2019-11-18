@@ -26,12 +26,15 @@ CREATE TABLE `edge_station` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `esId` int(11) NOT NULL,
   `fId` int(11) NOT NULL,
+  `fname` varchar(45) COLLATE utf8mb4_general_ci NOT NULL,
   `mcId` int(11) NOT NULL,
   `sId` int(11) NOT NULL,
   `status` varchar(45) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'Connected',
   `sType` varchar(45) COLLATE utf8mb4_general_ci NOT NULL,
+  `duration` int(11) DEFAULT NULL,
+  `location` varchar(45) COLLATE utf8mb4_general_ci NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -40,7 +43,7 @@ CREATE TABLE `edge_station` (
 
 LOCK TABLES `edge_station` WRITE;
 /*!40000 ALTER TABLE `edge_station` DISABLE KEYS */;
-INSERT INTO `edge_station` VALUES (1,4,4,5,1,'Connected','Temperature'),(2,4,4,5,2,'Connected','Humidity');
+INSERT INTO `edge_station` VALUES (3,4,4,'',5,3,'Inactive','Precipitation',NULL,''),(4,4,7,'',5,4,'Inactive','Visibility',NULL,''),(13,7,7,'\"Q\"',5,7,'Active','Humidity',NULL,'37.3382,-121.8863'),(14,7,7,'\"Q\"',5,2,'Active','Visibility',NULL,'37.3382,-121.8863');
 /*!40000 ALTER TABLE `edge_station` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -53,4 +56,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-11-14 17:28:33
+-- Dump completed on 2019-11-17 19:26:16
