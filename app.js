@@ -82,12 +82,12 @@ app.post('/register', (req, res) => {
                     return res.status(500).send(err);
                 }else{
                     console.log("Successful");
-                    res.status(200).json({message:"Registered Successfully"});
+                    res.status(200).json({message:"true"});
                 }
             });
         }else{
             console.log("Email exists");
-            res.status(200).json({message:"Email ID already registered"}); 
+            res.status(200).json({message:"false"}); 
         }
 
 
@@ -158,7 +158,7 @@ app.post('/farmer', (req, res) => {
                         return res.status(500).send(err);
                     }
                     });
-                    let q1="insert into edge_station (esId, fId, fname, mcId, sId, sType, location) VALUES ('"+JSON.stringify(result[0].id)+"','"+JSON.stringify(result[0].id)+"', '"+JSON.stringify(result[0].name)+"','"+JSON.stringify(result1[0].mcId)+"', '"+JSON.stringify(result1[0].sid)+"', '"+type+"','"+JSON.stringify(result[0].location)+"')";
+                    let q1="insert into edge_station (esId, fId, fname, mcId, sId, sType, location) VALUES ('"+result[0].id+"','"+result[0].id+"', '"+result[0].name+"','"+result1[0].mcId+"', '"+result1[0].sid+"', '"+type+"','"+result[0].location+"')";
                     //let q1="insert into edge_station (esId, fId, mcId, sId, sType) VALUES (1,1, '"+JSON.stringify(result1[0].mcId)+"', '"+JSON.stringify(result1[0].sid)+"', '"+type+"')";
                     
                     db.query(q1, (err, result) => {
@@ -230,7 +230,7 @@ app.get('/farmer', (req, res) => {
                     return res.status(500).send(err);
                 }
                 if(!result1.length){
-                    res.status(200).json({message:"No sensors rented"});
+                    res.status(200).json({message:""});
                 }else{
                     console.log(JSON.parse(JSON.stringify(result1)));
                     res.status(200).json({message : result1});
@@ -327,7 +327,7 @@ app.get('/farmerGetMachine', (req, res) => {
                     return res.status(500).send(err);
                 }
                 if(!result1.length){
-                    res.status(200).json({message:"No machines rented"});
+                    res.status(200).json({message:""});
                 }else{
                     console.log(JSON.parse(JSON.stringify(result1)));
                     res.status(200).json({message : result1});
@@ -423,7 +423,7 @@ app.get('/farmerGetService', (req, res) => {
                     return res.status(500).send(err);
                 }
                 if(!result1.length){
-                    res.status(200).json({message:"No services rented"});
+                    res.status(200).json({message:""});
                 }else{
                     console.log(JSON.parse(JSON.stringify(result1)));
                     res.status(200).json({message : result1});
@@ -464,7 +464,7 @@ app.get('/monitor', (req, res) => {
                     return res.status(500).send(err);
                 }
                 if(!result1.length){
-                    res.status(200).json({message:"No active sensors"});
+                    res.status(200).json({message:""});
                 }else{
                     var listOfObjects = [];
                     console.log(result1[0].sType);
@@ -534,7 +534,7 @@ app.get('/edgeStation', (req, res) => {
                     return res.status(500).send(err);
                 }
                 if(!result1.length){
-                    res.status(200).json({message:"No sensors on any edge station"});
+                    res.status(200).json({message:""});
                 }else{
                     console.log(JSON.parse(JSON.stringify(result1)));
                     res.status(200).json({message : result1});
@@ -785,7 +785,7 @@ app.get('/mcGetSensor', (req, res) => {
                     return res.status(500).send(err);
                 }
                 if(!result1.length){
-                    res.status(200).json({message:"No sensors added"});
+                    res.status(200).json({message:""});
                 }else{
                     res.status(200).json({message : result1});
                 }
@@ -815,7 +815,7 @@ app.get('/mcGetMachine', (req, res) => {
                     return res.status(500).send(err);
                 }
                 if(!result1.length){
-                    res.status(200).json({message:"No machines added"});
+                    res.status(200).json({message:""});
                 }else{
                     console.log(JSON.parse(JSON.stringify(result1)));
                     res.status(200).json({message : result1});
@@ -848,7 +848,7 @@ app.get('/mcGetService', (req, res) => {
                     return res.status(500).send(err);
                 }
                 if(!result1.length){
-                    res.status(200).json({message:"No services added"});
+                    res.status(200).json({message:""});
                 }else{
                     console.log(JSON.parse(JSON.stringify(result1)));
                     res.status(200).json({message : result1});
@@ -886,22 +886,28 @@ app.get('/mcmonitor', (req, res) => {
                     return res.status(500).send(err);
                 }
                 if(!result1.length){
-                    res.status(200).json({message:"No active sensors"});
+                    res.status(200).json({message:""});
                 }else{
                     var listOfObjects = [];
                     console.log("bjhcvsdjhcvdsvcj",result1[0].sType);
                     
-                    for(var i=0;i<result1.length;i++){
+                    for(let i=0;i<result1.length;i++){
                         let loc=result1[i].location;
+                        
                         request(`https://api.darksky.net/forecast/1cc49bed160877460d1977016029cdd8/${loc}`, { json: true }, (err, resp, body) => {
-                        if (err) { return console.log(err); }
+                            if (err) { return console.log(err); }
+                            
                             if(result1[i].sType==="Temperature"){
+                                console.log(resp.body);
                                 console.log(resp.body.currently.temperature);
                                 var singleObj = {};
                                 singleObj['fname'] = result1[i].fname;
                                 singleObj['type'] = result1[i].sType;
                                 singleObj['value'] = resp.body.currently.temperature;
                                 listOfObjects.push(singleObj);
+                                if(i == result1.length-1){
+                                    res.status(200).json({message : listOfObjects});
+                                }
                             }else if(result1[i].sType==="Humidity"){
                                 console.log(resp.body.currently.humidity);
                                 var singleObj = {};
@@ -909,6 +915,9 @@ app.get('/mcmonitor', (req, res) => {
                                 singleObj['type'] = result1[i].sType;
                                 singleObj['value'] = resp.body.currently.humidity;
                                 listOfObjects.push(singleObj);
+                                if(i == result1.length-1){
+                                    res.status(200).json({message : listOfObjects});
+                                }
                             }else if(result1[i].sType==="Precipitation"){
                                 console.log(resp.body.currently.precipIntensity);
                                 var singleObj = {};
@@ -916,6 +925,9 @@ app.get('/mcmonitor', (req, res) => {
                                 singleObj['type'] = result1[i].sType;
                                 singleObj['value'] = resp.body.currently.precipIntensity;
                                 listOfObjects.push(singleObj);
+                                if(i == result1.length-1){
+                                    res.status(200).json({message : listOfObjects});
+                                }
                             }else if(result1[i].sType==="Wind"){
                                 console.log(resp.body.currently.windSpeed);
                                 var singleObj = {};
@@ -923,6 +935,9 @@ app.get('/mcmonitor', (req, res) => {
                                 singleObj['type'] = result1[i].sType;
                                 singleObj['value'] = resp.body.currently.wind;
                                 listOfObjects.push(singleObj);
+                                if(i == result1.length-1){
+                                    res.status(200).json({message : listOfObjects});
+                                }
                             }else if(result1[i].sType==="Visibility"){
                                 console.log(resp.body.currently.visibility);
                                 var singleObj = {};
@@ -930,10 +945,13 @@ app.get('/mcmonitor', (req, res) => {
                                 singleObj['type'] = result1[i].sType;
                                 singleObj['value'] = resp.body.currently.visibility;
                                 listOfObjects.push(singleObj);
+                                if(i == result1.length-1){
+                                    res.status(200).json({message : listOfObjects});
+                                }
                         }
                     });
                     console.log(listOfObjects);
-                    res.status(200).json({message : listOfObjects});
+                    // res.status(200).json({message : listOfObjects});
                     
                 }
                 }
@@ -943,6 +961,284 @@ app.get('/mcmonitor', (req, res) => {
         }
     );
 });
+
+
+
+
+
+
+
+//machine controller update service status to ACTIVE
+app.post('/updateServiceStatus', (req, res) => {
+    console.log("req body "+ JSON.stringify(req.body));
+    let id=req.body.sid;
+    let q="select id from user where email = '"+sess.email+"'";
+    
+    db.query(q, (err, result) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+        if(!result.length){
+            res.status(500).json({message:"Invalid Session"});
+        }else{
+            let q2="UPDATE services SET status = 'Active' WHERE id='"+id+"'";
+            db.query(q2, (err, result1) => {
+                console.log(result1);
+                if (err) {
+                    console.log(err);
+                    return res.status(500).send(err);
+                }
+                if(!result1.length){
+                    res.status(200).json({message:"Success"});
+                }
+                }
+            );
+            
+        }
+        }
+    );
+});
+
+//machine controller update service status to INACTIVE
+app.post('/updateServiceStatusInactive', (req, res) => {
+    console.log("inactiveeeeeeeeee "+ JSON.stringify(req.body));
+    let id=req.body.sid;
+    let q="select id from user where email = '"+sess.email+"'";
+    
+    db.query(q, (err, result) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+        if(!result.length){
+            res.status(500).json({message:"Invalid Session"});
+        }else{
+            let q2="UPDATE services SET status = 'Inactive' WHERE id='"+id+"'";
+            db.query(q2, (err, result1) => {
+                console.log(result1);
+                if (err) {
+                    console.log(err);
+                    return res.status(500).send(err);
+                }
+                if(!result1.length){
+                    res.status(200).json({message:"Success"});
+                }
+                }
+            );
+            
+        }
+        }
+    );
+});
+
+
+
+
+
+//machine controller update service status to Not In Use
+app.post('/updateServiceStatusDisconnect', (req, res) => {
+    console.log("req body "+ JSON.stringify(req.body));
+    let id=req.body.sid;
+    let q="select id from user where email = '"+sess.email+"'";
+    
+    db.query(q, (err, result) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+        if(!result.length){
+            res.status(500).json({message:"Invalid Session"});
+        }else{
+            let q2="UPDATE services SET status = 'Not In Use' WHERE id='"+id+"'";
+            db.query(q2, (err, result1) => {
+                console.log(result1);
+                if (err) {
+                    console.log(err);
+                    return res.status(500).send(err);
+                }
+                if(!result1.length){
+                    res.status(200).json({message:"Success"});
+                }
+                }
+            );
+            
+        }
+        }
+    );
+});
+
+
+
+
+//machine controller delete NOT IN USE service
+app.post('/updateServiceStatusDelete', (req, res) => {
+    console.log("req body "+ JSON.stringify(req.body));
+    let id=req.body.sid;
+    let q="select id from user where email = '"+sess.email+"'";
+    
+    db.query(q, (err, result) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+        if(!result.length){
+            res.status(500).json({message:"Invalid Session"});
+        }else{
+            let q2="DELETE from services WHERE id='"+id+"'";
+            db.query(q2, (err, result1) => {
+                console.log(result1);
+                if (err) {
+                    console.log(err);
+                    return res.status(500).send(err);
+                }
+                if(!result1.length){
+                    res.status(200).json({message:"Success"});
+                }
+                }
+            );
+            
+        }
+        }
+    );
+});
+
+
+
+
+
+
+//machine controller update machine status to ACTIVE
+app.post('/updateMachineStatus', (req, res) => {
+    console.log("req body "+ JSON.stringify(req.body));
+    let id=req.body.sid;
+    let q="select id from user where email = '"+sess.email+"'";
+    
+    db.query(q, (err, result) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+        if(!result.length){
+            res.status(500).json({message:"Invalid Session"});
+        }else{
+            let q2="UPDATE machine SET status = 'Active' WHERE id='"+id+"'";
+            db.query(q2, (err, result1) => {
+                console.log(result1);
+                if (err) {
+                    console.log(err);
+                    return res.status(500).send(err);
+                }
+                if(!result1.length){
+                    res.status(200).json({message:"Success"});
+                }
+                }
+            );
+            
+        }
+        }
+    );
+});
+
+//machine controller update machine status to INACTIVE
+app.post('/updateMachineStatusInactive', (req, res) => {
+    console.log("inactiveeeeeeeeee "+ JSON.stringify(req.body));
+    let id=req.body.sid;
+    let q="select id from user where email = '"+sess.email+"'";
+    
+    db.query(q, (err, result) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+        if(!result.length){
+            res.status(500).json({message:"Invalid Session"});
+        }else{
+            let q2="UPDATE machine SET status = 'Inactive' WHERE id='"+id+"'";
+            db.query(q2, (err, result1) => {
+                console.log(result1);
+                if (err) {
+                    console.log(err);
+                    return res.status(500).send(err);
+                }
+                if(!result1.length){
+                    res.status(200).json({message:"Success"});
+                }
+                }
+            );
+            
+        }
+        }
+    );
+});
+
+
+
+
+
+//machine controller update service status to ACTIVE
+app.post('/updateMachineStatusDisconnect', (req, res) => {
+    console.log("req body "+ JSON.stringify(req.body));
+    let id=req.body.sid;
+    let q="select id from user where email = '"+sess.email+"'";
+    
+    db.query(q, (err, result) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+        if(!result.length){
+            res.status(500).json({message:"Invalid Session"});
+        }else{
+            let q2="UPDATE machine SET status = 'Not In Use' WHERE id='"+id+"'";
+            db.query(q2, (err, result1) => {
+                console.log(result1);
+                if (err) {
+                    console.log(err);
+                    return res.status(500).send(err);
+                }
+                if(!result1.length){
+                    res.status(200).json({message:"Success"});
+                }
+                }
+            );
+            
+        }
+        }
+    );
+});
+
+
+
+
+//machine controller delete NOT IN USE machine
+app.post('/updateServiceStatusDelete', (req, res) => {
+    console.log("req body "+ JSON.stringify(req.body));
+    let id=req.body.sid;
+    let q="select id from user where email = '"+sess.email+"'";
+    
+    db.query(q, (err, result) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+        if(!result.length){
+            res.status(500).json({message:"Invalid Session"});
+        }else{
+            let q2="DELETE from machine WHERE id='"+id+"'";
+            db.query(q2, (err, result1) => {
+                console.log(result1);
+                if (err) {
+                    console.log(err);
+                    return res.status(500).send(err);
+                }
+                if(!result1.length){
+                    res.status(200).json({message:"Success"});
+                }
+                }
+            );
+            
+        }
+        }
+    );
+});
+
+
+
+
+
 
 app.get('/logout',function(req,res){    
     req.session.destroy(function(err){  
@@ -956,3 +1252,109 @@ app.get('/logout',function(req,res){
     });
 });  
 
+
+
+
+
+
+app.get('/allSensors', (req, res) => {
+    console.log("req body "+ JSON.stringify(req.body));
+    //sess = req.session;
+    let q="select * from sensor";
+    
+    db.query(q, (err, result) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+        if(!result.length){
+            return res.status(500).json({message:"No Sensors"});
+        
+        }
+        else {
+            res.status(200).json({message: result});
+        }
+    }
+    );
+});
+
+
+app.get('/allmachine', (req, res) => {
+    console.log("req body "+ JSON.stringify(req.body));
+    //sess = req.session;
+    let q="select * from machine";
+    
+    db.query(q, (err, result) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+        if(!result.length){
+            return res.status(500).json({message:"No machines"});
+        
+        }
+        else {
+            res.status(200).json({message: result});
+        }
+    }
+    );
+});
+
+
+app.get('/allServices', (req, res) => {
+    console.log("req body "+ JSON.stringify(req.body));
+    //sess = req.session;
+    let q="select * from services";
+    
+    db.query(q, (err, result) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+        if(!result.length){
+            return res.status(500).json({message:"No Services"});
+        
+        }
+        else {
+            res.status(200).json({message: result});
+        }
+    }
+    );
+});
+
+app.get('/allUsers', (req, res) => {
+    console.log("req body "+ JSON.stringify(req.body));
+    //sess = req.session;
+    let q="select * from user";
+    
+    db.query(q, (err, result) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+        if(!result.length){
+            return res.status(500).json({message:"No User"});
+        
+        }
+        else {
+            res.status(200).json({message: result});
+        }
+    }
+    );
+});
+
+app.get('/allEdgeStation', (req, res) => {
+    console.log("req body "+ JSON.stringify(req.body));
+    //sess = req.session;
+    let q="select * from edge_station";
+    
+    db.query(q, (err, result) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+        if(!result.length){
+            return res.status(500).json({message:"No edge_stations"});
+        
+        }
+        else {
+            res.status(200).json({message: result});
+        }
+    }
+    );
+});
