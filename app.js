@@ -15,6 +15,30 @@ app.use(session({secret: 'abcd',saveUninitialized: true,resave: true}));
 var sess;
 
 const port = 5000;
+const MongoClient = require('mongodb').MongoClient;
+const Bcrypt = require("bcryptjs");
+var mongo = require('mongodb');
+let mongoose = require('mongoose');
+mongoose.set('useFindAndModify', false);
+const Sensor = require("./src/models/SensorSchema");
+
+
+// Connection URL
+const url = 'mongodb+srv://root:root@cluster0-srg1l.mongodb.net/smart_ag?retryWrites=true&w=majority';
+ 
+// Database Name
+const dbName = 'smart_ag';
+ 
+
+mongoose.set("useCreateIndex", true);
+mongoose.set("useUnifiedTopology", true); //issue with a depricated- found it
+// mongoose.set("poolSize", 10);
+mongoose
+  .connect(url, { useNewUrlParser: true, poolSize: 10 })
+  .then(() => console.log("Connected Successfully to MongoDB"))
+  .catch(err => console.error(err));
+
+  const dbnew = mongoose.connection;
 
 const db = mysql.createConnection ({
     host: 'localhost',
@@ -130,9 +154,11 @@ app.post('/login', (req, res) => {
 app.post('/farmer', (req, res) => {
 
     let type = req.body.type;
+    let start_date=req.body.start_date;
+    let end_date=req.body.end_date;
 
     let q="select id,name,location from user where email = '"+sess.email+"'";
-    let q2="select mcId, sid from sensor where stype='"+type+"' and price=(select min(price) from sensor where stype='"+type+"' and status='Not In Use' limit 1)";
+    let q2="select mcId, sid,price from sensor where stype='"+type+"' and price=(select min(price) from sensor where stype='"+type+"' and status='Not In Use' limit 1)";
     
     db.query(q, (err, result) => {
         if (err) {
@@ -158,13 +184,16 @@ app.post('/farmer', (req, res) => {
                         return res.status(500).send(err);
                     }
                     });
-                    let q1="insert into edge_station (esId, fId, fname, mcId, sId, sType, location) VALUES ('"+result[0].id+"','"+result[0].id+"', '"+result[0].name+"','"+result1[0].mcId+"', '"+result1[0].sid+"', '"+type+"','"+result[0].location+"')";
+                    let q1="insert into edge_station (esId, fId, fname, mcId, sId, sType, location, start_date, end_date) VALUES ('"+result[0].id+"','"+result[0].id+"', '"+result[0].name+"','"+result1[0].mcId+"', '"+result1[0].sid+"', '"+type+"','"+result[0].location+"','"+start_date+"','"+end_date+"')";
                     //let q1="insert into edge_station (esId, fId, mcId, sId, sType) VALUES (1,1, '"+JSON.stringify(result1[0].mcId)+"', '"+JSON.stringify(result1[0].sid)+"', '"+type+"')";
                     
                     db.query(q1, (err, result) => {
                     if (err) {
                         return res.status(500).send(err);
                     }else{
+                        console.log(end_date-start_date);
+                        let billingQuery="insert into billing (fId, fname, mcId, sId, sType, start_date, end_date, amount) VALUES ('"+result[0].id+"', '"+result[0].name+"','"+result1[0].mcId+"', '"+result1[0].sid+"', '"+type+"','"+start_date+"','"+end_date+"', '"+amount+"')";
+                        
                         res.status(200).json({message:"Inserted into edge station"});
                     }
                     });
@@ -456,7 +485,7 @@ app.get('/monitor', (req, res) => {
             res.status(500).json({message:"Invalid Session"});
         }else{
             console.log("in");
-            let q1="select sType from edge_station where fId='"+result[0].id+"' and status='Active'";
+            let q1="select sType,sId from edge_station where fId='"+result[0].id+"' and status='Active'";
             let loc=result[0].location;
             db.query(q1, (err, result1) => {
                 if (err) {
@@ -468,42 +497,80 @@ app.get('/monitor', (req, res) => {
                 }else{
                     var listOfObjects = [];
                     console.log(result1[0].sType);
+					let sensor;
                     request(`https://api.darksky.net/forecast/1cc49bed160877460d1977016029cdd8/${loc}`, { json: true }, (err, resp, body) => {
                     if (err) { return console.log(err); }
                     for(var i=0;i<result1.length;i++){
+						
                         if(result1[i].sType=="Temperature"){
                             console.log(resp.body.currently.temperature);
                             var singleObj = {};
                             singleObj['type'] = result1[i].sType;
                             singleObj['value'] = resp.body.currently.temperature;
                             listOfObjects.push(singleObj);
+							sensor = new Sensor({ 
+							                    "fId": result[0].id,
+												"sId": result1[i].sId,
+							                    "type":result1[i].sType, 
+							                    "value":resp.body.currently.temperature
+							                });
                         }else if(result1[i].sType=="Humidity"){
                             console.log(resp.body.currently.humidity);
                             var singleObj = {};
                             singleObj['type'] = result1[i].sType;
                             singleObj['value'] = resp.body.currently.humidity;
                             listOfObjects.push(singleObj);
+							sensor = new Sensor({ 
+							                    "fId": result[0].id,
+												"sId": result1[i].sId, 
+							                    "type":result1[i].sType, 
+							                    "value":resp.body.currently.humidity
+							                });
                         }else if(result1[i].sType=="Precipitation"){
                             console.log(resp.body.currently.precipIntensity);
                             var singleObj = {};
                             singleObj['type'] = result1[i].sType;
                             singleObj['value'] = resp.body.currently.precipIntensity;
                             listOfObjects.push(singleObj);
+							sensor = new Sensor({ 
+							                    "fId": result[0].id, 
+												"sId": result1[i].sId,
+							                    "type":result1[i].sType, 
+							                    "value":resp.body.currently.precipIntensity
+							                });
                         }else if(result1[i].sType=="Wind"){
                             console.log(resp.body.currently.windSpeed);
                             var singleObj = {};
                             singleObj['type'] = result1[i].sType;
                             singleObj['value'] = resp.body.currently.wind;
                             listOfObjects.push(singleObj);
+							sensor = new Sensor({ 
+							                    "fId": result[0].id, 
+												"sId": result1[i].sId,
+							                    "type":result1[i].sType, 
+							                    "value":resp.body.currently.wind
+							                });
                         }else if(result1[i].sType=="Visibility"){
                             console.log(resp.body.currently.visibility);
                             var singleObj = {};
                             singleObj['type'] = result1[i].sType;
                             singleObj['value'] = resp.body.currently.visibility;
-                            listOfObjects.push(singleObj);
+                            listOfObjects.push(singleObj); 
+							sensor = new Sensor({ 
+							                    "fId": result[0].id, 
+												"sId": result1[i].sId,
+							                    "type":result1[i].sType, 
+							                    "value":resp.body.currently.visibility
+							                });
                         }
+						sensor.save().then(()=>{
+							console.log("Sensor data inserted successfully");
+						}).catch(err=>{
+						    console.log("Error insereting record: "+err);
+		                });
                     }
                     console.log(listOfObjects);
+					
                     res.status(200).json({message : listOfObjects});
                     });
                 }
@@ -513,6 +580,33 @@ app.get('/monitor', (req, res) => {
         }
     );
 });
+
+
+
+//farmer get data from mongodb for charts
+app.get('/charts', (req, res) => {
+    let q="select id from user where email = '"+sess.email+"'";
+    db.query(q, (err, result) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).send(err);
+        }
+        else{
+            Sensor.find({fId: result[0].id}).then(sensor =>{
+                if(!sensor){
+                    return res.json({message:""});
+                }
+                else{
+                    console.log(sensor);
+                    res.json({message:"Sensors Found", result:sensor});
+                }
+            })
+        }
+        });
+});
+
+
+
 
 
 //machine controller edge station
